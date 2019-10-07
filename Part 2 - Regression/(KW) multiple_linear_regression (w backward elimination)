@@ -1,0 +1,68 @@
+#IMPORTING LIBRARIES
+import numpy as np #for mathematical tools
+import matplotlib.pyplot as plt #for plotting dataset
+import pandas as pd #for importing and managing dataset
+
+#Importing the dataset
+dataset = pd.read_csv('50_Startups.csv')
+X = dataset.iloc[:,:-1].values
+y = dataset.iloc[:,4].values
+
+#Dummy Variable Creation
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+ct = ColumnTransformer(
+        [('one_hot_encoder', OneHotEncoder(), [3])],
+        remainder = 'passthrough')
+X = np.array(ct.fit_transform(X), dtype = np.float)
+
+#Avoiding the Dummy Variable Trap
+X = X[:, 1:]
+
+#Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split 
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2,random_state = 0)
+
+#Fitting Multiple Linear Regression to the Training Set
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X_train, y_train)
+
+#Predicting the Test results
+y_pred = regressor.predict(X_test)
+
+#Building the optimal model using Backward Elimination
+import statsmodels.formula.api as sm
+X = np.append(arr = np.ones((50, 1)).astype(int),values = X, axis = 1) #axis = 1 means add a column
+X_opt = X[:,[0, 1, 2, 3, 4, 5]]
+regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+regressor_OLS.summary()
+X_opt = X[:,[0, 1, 3, 4, 5]]
+regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+regressor_OLS.summary()
+X_opt = X[:,[0, 3, 4, 5]]
+regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+regressor_OLS.summary()
+X_opt = X[:,[0, 3, 5]]
+regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+regressor_OLS.summary()
+X_opt = X[:,[0, 3]]
+regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+regressor_OLS.summary()
+
+X_opt = X[:,[0, 1, 2, 3, 4, 5]]
+regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+Pval = regressor_OLS.pvalues
+
+while np.amax(Pval) > 0.05:
+    #Convert independent variables to a list
+    Var_X = list(range(0,np.size(X_opt,1)))
+    #Remove the variable with P-value > 0.05
+    Var_X.pop(np.argmax(Pval))
+    #Fit the model without the removed variable
+    X_opt = X[:,Var_X]
+    regressor_OLS = sm.OLS(endog = y, exog = X_opt).fit()
+    Pval = regressor_OLS.pvalues
+regressor_OLS.summary()
+np.delete()
+print(X_opt[1])
