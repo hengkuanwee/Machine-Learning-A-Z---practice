@@ -22,7 +22,7 @@ y = sc_y.fit_transform(y.reshape(len(y),-1))
 #Fitting Regression Model to the dataset
 from sklearn.svm import SVR
 regressor = SVR(kernel = 'rbf')
-regressor.fit(X,y)
+regressor.fit(X,y.ravel())
 
 #Predicting a new result
 A = sc_X.transform(np.array([[6.5]]))
