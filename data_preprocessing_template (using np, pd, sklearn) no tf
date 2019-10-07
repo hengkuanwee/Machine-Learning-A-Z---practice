@@ -50,4 +50,4 @@ X_test = sc_X.transform(X_test)
 ct = ColumnTransformer(
         [('one_hot_encoder', OneHotEncoder(), [3])],
         remainder = 'passthrough')
-X = np.array(ct.fit_transform(X), dtype = np.float)
+X = np.array(ct.fit_transform(X), dtype = np.float) 
