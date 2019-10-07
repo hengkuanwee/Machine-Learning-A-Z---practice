@@ -1,1 +1,53 @@
+#NOTE: I would recommend converting dataset into tensors and proceed with using Tensorflow to train the model, but since this is the basics, I would keep it simple.
 
+# Importing the libraries
+import numpy as np #for mathematical tools
+import pandas as pd #for importing and managing dataset
+import tensorflow as tf
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+from tensorflow import feature_column as fc
+
+from matplotlib import pyplot as plt #for plotting dataset
+
+tf.__version__ #checking tensorflow versions
+
+# Importing the dataset
+dataset = pd.read_csv('Data.csv')
+dataset.head()
+
+# Examine the dataset for intuition and identify missing, incorrect, redundant data in order to proceed with the pre-processing phase
+dataset.describe() #to have a summary of your dataset
+dataset.info() #to have a summary of your dataset
+
+# Fill in missing data
+dataset.isnull().any() #to double confirm missing data
+# For numerical data
+dataset['header'].fillna(dataset['header'].mean(), inplace = True) #replace missing data with mean/median etc.
+# For categorical data
+dataset['header'].fillna('unknown')
+
+# Drop columns which are redundant
+dataset = dataset.drop(['header1', 'header2', 'header3'], axis = 1)
+
+# Split into X and y
+X = dataset.iloc[:,:-1].values #to take all rows, and coulmns - 1
+y = dataset.iloc[:,-1].values #to take all rows, and coulmns - 1
+
+# Splitting the dataset into the Training set and Test set
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2,random_state = 0)
+
+# Feature Scaling
+sc_X = StandardScaler()
+X_train = sc_X.fit_transform(X_train)
+X_test = sc_X.transform(X_test)
+
+# Dummy Variable Creation
+ct = ColumnTransformer(
+        [('one_hot_encoder', OneHotEncoder(), [3])],
+        remainder = 'passthrough')
+X = np.array(ct.fit_transform(X), dtype = np.float) 
