@@ -1,4 +1,4 @@
-# Machine-Learning-A-Z---practice
+# Machine Learning A-Z
 Personal revision of codes from Udemy Course (ML A-Z) 
 
 Hi All,
